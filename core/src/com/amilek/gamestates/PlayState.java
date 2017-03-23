@@ -1,12 +1,10 @@
 package com.amilek.gamestates;
 
-import com.amilek.entities.Asteroid;
-import com.amilek.entities.Bullet;
-import com.amilek.entities.Particle;
-import com.amilek.entities.Player;
+import com.amilek.entities.*;
 import com.amilek.main.Game;
 import com.amilek.managers.GameStateManager;
 import com.amilek.managers.Jukebox;
+import com.amilek.managers.Save;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -34,6 +32,11 @@ public class PlayState extends GameState {
     private int level;
     private int totalAsteroids;
     private int numAsteroidsLeft;
+
+    private FlyingSaucer flyingSaucer;
+    private ArrayList<Bullet> enemyBullets;
+    private float fsTimer;
+    private float fsTime;
 
     public PlayState(GameStateManager gms) {
         super(gms);
@@ -63,6 +66,10 @@ public class PlayState extends GameState {
         spawnAsteroids();
 
         hudPlayer = new Player(null);
+
+        fsTimer = 0;
+        fsTime = 5;
+        enemyBullets = new ArrayList<Bullet>();
 
     }
 
@@ -132,7 +139,10 @@ public class PlayState extends GameState {
         player.update(dt);
         if (player.isDead()) {
             if (player.getExtraLives() == 0) {
-                gsm.setState(GameStateManager.MENU);
+                Jukebox.stopAll();
+                Save.gd.setTenativeScore(player.getScore());
+                gsm.setState(GameStateManager.GAMEOVER);
+                return;
             }
             player.reset();
             player.looseLive();
@@ -144,6 +154,39 @@ public class PlayState extends GameState {
             bullets.get(i).update(dt);
             if (bullets.get(i).shouldRemove()) {
                 bullets.remove(i);
+                i--;
+            }
+        }
+
+        //update flying saucer
+        if (flyingSaucer == null) {
+            fsTimer += dt;
+            if (fsTimer >= fsTime) {
+                fsTimer = 0;
+                int type = MathUtils.random() < 0.5 ?
+                        FlyingSaucer.SMALL : FlyingSaucer.LARGE;
+                int direction = MathUtils.random() < 0.5 ?
+                        FlyingSaucer.RIGHT : FlyingSaucer.LEFT;
+                flyingSaucer = new FlyingSaucer(
+                        type,
+                        direction,
+                        player,
+                        enemyBullets);
+            }
+        } else {
+            flyingSaucer.update(dt);
+            if(flyingSaucer.shouldRemove()){
+                flyingSaucer = null;
+                //Jukebox.stop("smallsaucer");
+                //Jukebox.stop("largesaucer");
+            }
+        }
+
+        //update enemy bullets
+        for (int i = 0; i < enemyBullets.size(); i++) {
+            enemyBullets.get(i).update(dt);
+            if (enemyBullets.get(i).shouldRemove()) {
+                enemyBullets.remove(i);
                 i--;
             }
         }
@@ -210,6 +253,9 @@ public class PlayState extends GameState {
 
     public void draw() {
 
+        sb.setProjectionMatrix(Game.camera.combined);
+        sr.setProjectionMatrix(Game.camera.combined);
+
         //draw player
         player.draw(sr);
 
@@ -221,6 +267,16 @@ public class PlayState extends GameState {
         //draw bullets
         for (Asteroid asteroid : asteroids) {
             asteroid.draw(sr);
+        }
+
+        //draw flying saucer
+        if(flyingSaucer != null){
+            flyingSaucer.draw(sr);
+        }
+
+        //draw enemy bullets
+        for (Bullet bullet : enemyBullets) {
+            bullet.draw(sr);
         }
 
         //draw particles
@@ -243,14 +299,19 @@ public class PlayState extends GameState {
     }
 
     public void handleInput() {
-        player.setLeft(Gdx.input.isKeyPressed(Input.Keys.LEFT));
-        player.setRight(Gdx.input.isKeyPressed(Input.Keys.RIGHT));
-        player.setUp(Gdx.input.isKeyPressed(Input.Keys.UP));
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            player.shoot();
+        if (!player.isHit()) {
+            player.setLeft(Gdx.input.isKeyPressed(Input.Keys.LEFT));
+            player.setRight(Gdx.input.isKeyPressed(Input.Keys.RIGHT));
+            player.setUp(Gdx.input.isKeyPressed(Input.Keys.UP));
+            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+                player.shoot();
+            }
         }
     }
 
     public void dispose() {
+        sb.dispose();
+        sr.dispose();
+        font.dispose();
     }
 }

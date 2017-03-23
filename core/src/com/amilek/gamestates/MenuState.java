@@ -3,6 +3,7 @@ package com.amilek.gamestates;
 
 import com.amilek.managers.GameStateManager;
 import com.amilek.main.Game;
+import com.amilek.managers.Save;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -46,6 +47,8 @@ public class MenuState extends GameState {
                 "Highscores",
                 "Quit"
         };
+
+        Save.load();
     }
 
     public void update(float dt) {
@@ -107,12 +110,15 @@ public class MenuState extends GameState {
         if(currentItem == 0){
             gsm.setState(GameStateManager.PLAY);
         } else if(currentItem == 1){
-            //gsm.setState(GameStateManager.HIGHSCORES);
+            gsm.setState(GameStateManager.HIGHSCORE);
         } else if(currentItem == 2){
             Gdx.app.exit();
         }
     }
 
     public void dispose() {
+        sb.dispose();
+        titleFont.dispose();
+        font.dispose();
     }
 }

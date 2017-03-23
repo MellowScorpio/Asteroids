@@ -109,7 +109,7 @@ public class Player extends SpaceObject {
     }
 
     public void setUp(boolean b) {
-        if(b && !up && !hit){
+        if(b && !up){
             Jukebox.loop("thruster");
         } else if(!b){
             Jukebox.stop("thruster");
@@ -183,6 +183,7 @@ public class Player extends SpaceObject {
 
         //check if hit
         if (hit) {
+            Jukebox.stop("thruster");
             hitTimer += dt;
             if (hitTimer > hitTime) {
                 dead = true;
@@ -292,8 +293,6 @@ public class Player extends SpaceObject {
         }
 
         sr.end();
-
-
     }
 
 
