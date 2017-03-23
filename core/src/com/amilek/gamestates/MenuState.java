@@ -1,6 +1,7 @@
 package com.amilek.gamestates;
 
 
+import com.amilek.entities.Asteroid;
 import com.amilek.managers.GameStateManager;
 import com.amilek.main.Game;
 import com.amilek.managers.Save;
@@ -11,10 +12,16 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
+
+import java.util.ArrayList;
 
 public class MenuState extends GameState {
 
     private SpriteBatch sb;
+    private ShapeRenderer sr;
+
     private BitmapFont titleFont;
     private BitmapFont font;
 
@@ -23,6 +30,8 @@ public class MenuState extends GameState {
     private int currentItem;
     private String[] menuItems;
 
+    private ArrayList<Asteroid> asteroids;
+
 
     public MenuState(GameStateManager gsm) {
         super(gsm);
@@ -30,6 +39,7 @@ public class MenuState extends GameState {
 
     public void init() {
         sb = new SpriteBatch();
+        sr = new ShapeRenderer();
 
         //set font
         FreeTypeFontGenerator gen =
@@ -49,14 +59,37 @@ public class MenuState extends GameState {
         };
 
         Save.load();
+
+        asteroids = new ArrayList<Asteroid>();
+        for(int i = 0; i < 6; i++){
+            asteroids.add(
+                    new Asteroid(
+                            MathUtils.random(Game.WIDTH),
+                            MathUtils.random(Game.HEIGHT),
+                            Asteroid.LARGE
+                    )
+            );
+        }
     }
 
     public void update(float dt) {
 
         handleInput();
+
+        for(Asteroid a:asteroids){
+            a.update(dt);
+        }
     }
 
     public void draw() {
+
+        sb.setProjectionMatrix(Game.camera.combined);
+        sr.setProjectionMatrix(Game.camera.combined);
+
+
+        for(Asteroid a:asteroids){
+            a.draw(sr);
+        }
 
         sb.begin();
 
@@ -118,6 +151,7 @@ public class MenuState extends GameState {
 
     public void dispose() {
         sb.dispose();
+        sr.dispose();
         titleFont.dispose();
         font.dispose();
     }

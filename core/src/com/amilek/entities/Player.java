@@ -205,6 +205,7 @@ public class Player extends SpaceObject {
         if (score >= requiredScore) {
             extraLives++;
             requiredScore += 10000;
+            Jukebox.play("extralife");
         }
 
         //turning

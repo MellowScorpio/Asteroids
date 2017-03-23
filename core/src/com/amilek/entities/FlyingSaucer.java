@@ -58,10 +58,10 @@ public class FlyingSaucer extends SpaceObject {
 
         if (type == LARGE) {
             score = 200;
-            //Jukebox.loop("largesaucer");
+            Jukebox.loop("largesaucer");
         } else if (type == SMALL) {
             score = 1000;
-            //Jukebox.loop("smallsaucer");
+            Jukebox.loop("smallsaucer");
         }
 
         fireTimer = 0;
@@ -137,7 +137,7 @@ public class FlyingSaucer extends SpaceObject {
                     );
                 }
                 bullets.add(new Bullet(x, y, radians));
-                //Jukebox.play("saucershoot");
+                Jukebox.play("saucershoot");
             }
         }
 

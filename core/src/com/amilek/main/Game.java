@@ -28,6 +28,12 @@ public class Game extends ApplicationAdapter {
         Jukebox.load("sounds/player_dead.wav", "player_dead");
         Jukebox.load("sounds/shoot.wav", "shoot");
         Jukebox.load("sounds/thrust.wav", "thruster");
+        Jukebox.load("sounds/saucershoot.wav", "saucershoot");
+        Jukebox.load("sounds/pulselow.wav", "pulselow");
+        Jukebox.load("sounds/pulsehigh.wav", "pulsehigh");
+        Jukebox.load("sounds/extralife.wav", "extralife");
+        Jukebox.load("sounds/largesaucer.wav", "largesaucer");
+        Jukebox.load("sounds/smallsaucer.wav", "smallsaucer");
 
 
         gsm = new GameStateManager();

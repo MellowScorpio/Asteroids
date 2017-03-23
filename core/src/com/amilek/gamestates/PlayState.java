@@ -38,6 +38,12 @@ public class PlayState extends GameState {
     private float fsTimer;
     private float fsTime;
 
+    private float maxDelay;
+    private float minDelay;
+    private float currentDelay;
+    private float bgTimer;
+    private boolean playLowPulse;
+
     public PlayState(GameStateManager gms) {
         super(gms);
     }
@@ -68,8 +74,15 @@ public class PlayState extends GameState {
         hudPlayer = new Player(null);
 
         fsTimer = 0;
-        fsTime = 5;
+        fsTime = 15;
         enemyBullets = new ArrayList<Bullet>();
+
+        // set bg music
+        maxDelay = 1;
+        minDelay = 0.25f;
+        currentDelay = maxDelay;
+        bgTimer = maxDelay;
+        playLowPulse = true;
 
     }
 
@@ -82,8 +95,10 @@ public class PlayState extends GameState {
     private void splitAsteroids(Asteroid asteroid) {
 
         createParticles(asteroid.getX(), asteroid.getY());
-
         numAsteroidsLeft--;
+        currentDelay =
+                ((maxDelay - minDelay) * numAsteroidsLeft / totalAsteroids) + minDelay;
+
         if (asteroid.getType() == Asteroid.LARGE) {
             asteroids.add(new Asteroid(asteroid.getX(), asteroid.getY(), Asteroid.MEDIUM));
             asteroids.add(new Asteroid(asteroid.getX(), asteroid.getY(), Asteroid.MEDIUM));
@@ -101,6 +116,7 @@ public class PlayState extends GameState {
         int numToSpawn = 4 + level - 1;
         totalAsteroids = numToSpawn * 7;
         numAsteroidsLeft = totalAsteroids;
+        currentDelay = maxDelay;
 
         for (int i = 0; i < numToSpawn; i++) {
 
@@ -146,6 +162,9 @@ public class PlayState extends GameState {
             }
             player.reset();
             player.looseLive();
+            flyingSaucer = null;
+            Jukebox.stop("largesaucer");
+            Jukebox.stop("smallsaucer");
             return;
         }
 
@@ -175,10 +194,10 @@ public class PlayState extends GameState {
             }
         } else {
             flyingSaucer.update(dt);
-            if(flyingSaucer.shouldRemove()){
+            if (flyingSaucer.shouldRemove()) {
                 flyingSaucer = null;
-                //Jukebox.stop("smallsaucer");
-                //Jukebox.stop("largesaucer");
+                Jukebox.stop("smallsaucer");
+                Jukebox.stop("largesaucer");
             }
         }
 
@@ -211,6 +230,18 @@ public class PlayState extends GameState {
 
         //check collisions
         checkCollisions();
+
+        //play bg music
+        bgTimer += dt;
+        if (!player.isHit() && bgTimer >= currentDelay) {
+            if (playLowPulse) {
+                Jukebox.play("pulselow");
+            } else {
+                Jukebox.play("pulsehigh");
+            }
+            playLowPulse = !playLowPulse;
+            bgTimer = 0;
+        }
     }
 
     private void checkCollisions() {
@@ -248,6 +279,83 @@ public class PlayState extends GameState {
             }
         }
 
+        // player vs flying saucer
+        if (flyingSaucer != null) {
+            if (player.intersects(flyingSaucer)) {
+                player.hit();
+                createParticles(flyingSaucer.getX(), flyingSaucer.getY());
+                flyingSaucer = null;
+                Jukebox.stop("smallsaucer");
+                Jukebox.stop("largesaucer");
+                Jukebox.play("explode");
+            }
+        }
+
+        //bullet - flying saucer collision
+        if (flyingSaucer != null) {
+            for (int i = 0; i < bullets.size(); i++) {
+                Bullet b = bullets.get(i);
+                if (flyingSaucer.contains(b.getX(), b.getY())) {
+                    bullets.remove(i);
+                    createParticles(flyingSaucer.getX(), flyingSaucer.getY());
+                    player.incrementScore(flyingSaucer.getScore());
+                    flyingSaucer = null;
+                    Jukebox.stop("smallsaucer");
+                    Jukebox.stop("largesaucer");
+                    Jukebox.play("explode");
+                    break;
+                }
+            }
+        }
+
+        //player vs enemy bullets
+        if (!player.isHit()) {
+            for (int i = 0; i < enemyBullets.size(); i++) {
+                Bullet b = enemyBullets.get(i);
+                if (player.contains(b.getX(), b.getY())) {
+                    player.hit();
+                    enemyBullets.remove(i);
+                    Jukebox.play("explode");
+                    break;
+                }
+            }
+        }
+
+        //flying saucer-asteroid
+        if (flyingSaucer != null) {
+            for (int i = 0; i < asteroids.size(); i++) {
+                Asteroid a = asteroids.get(i);
+                if (flyingSaucer.intersects(a)) {
+                    splitAsteroids(a);
+                    createParticles(a.getX(), a.getY());
+                    createParticles(flyingSaucer.getX(), flyingSaucer.getY());
+                    flyingSaucer = null;
+                    Jukebox.stop("smallsaucer");
+                    Jukebox.stop("largesaucer");
+                    Jukebox.play("explode");
+                    break;
+                }
+            }
+        }
+
+
+        //asteroid-enemy bullet
+        for (int i = 0; i < enemyBullets.size(); i++) {
+            Bullet b = enemyBullets.get(i);
+            for (int j = 0; j < asteroids.size(); j++) {
+                Asteroid a = asteroids.get(j);
+                if (a.contains(b.getX(), b.getY())) {
+                    enemyBullets.remove(i);
+                    i--;
+                    asteroids.remove(j);//no need to decrement j cuz of break
+                    splitAsteroids(a);
+                    //increment player score
+                    player.incrementScore(a.getScore());
+                    Jukebox.play("explode");
+                    break;
+                }
+            }
+        }
     }
 
 
@@ -270,7 +378,7 @@ public class PlayState extends GameState {
         }
 
         //draw flying saucer
-        if(flyingSaucer != null){
+        if (flyingSaucer != null) {
             flyingSaucer.draw(sr);
         }
 
