@@ -23,6 +23,8 @@ public class GameOverState extends GameState {
     private BitmapFont gameOverFont;
     private BitmapFont font;
 
+    private static char[] LAST_NAME;
+
 
     public GameOverState(GameStateManager gsm) {
         super(gsm);
@@ -35,7 +37,11 @@ public class GameOverState extends GameState {
 
         newHighScore = Save.gd.isHighScore(Save.gd.getTenativeScore());
         if (newHighScore) {
-            newName = new char[]{'A', 'A', 'A'};
+            if (LAST_NAME != null) {
+                newName = LAST_NAME;
+            } else {
+                newName = new char[]{'A', 'A', 'A'};
+            }
         }
 
         //set font
@@ -96,7 +102,7 @@ public class GameOverState extends GameState {
                 100,
                 244 + 14 * currentChar,
                 100
-                );
+        );
         sr.end();
 
 
@@ -111,38 +117,42 @@ public class GameOverState extends GameState {
                         new String(newName)
                 );
                 Save.save();
+                LAST_NAME = newName;
             }
             gsm.setState(GameStateManager.HIGHSCORE);
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
-            if (newName[currentChar] == ' ') {
-                newName[currentChar] = 'Z';
-            } else {
-                newName[currentChar]--;
-                if (newName[currentChar] < 'A') {
-                    newName[currentChar] = ' ';
+        if (newHighScore) {
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+                if (newName[currentChar] == ' ') {
+                    newName[currentChar] = 'Z';
+                } else {
+                    newName[currentChar]--;
+                    if (newName[currentChar] < 'A') {
+                        newName[currentChar] = ' ';
+                    }
                 }
             }
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-            if (newName[currentChar] == ' ') {
-                newName[currentChar] = 'A';
-            } else {
-                newName[currentChar]++;
-                if (newName[currentChar] > 'Z') {
-                    newName[currentChar] = ' ';
+            if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+                if (newName[currentChar] == ' ') {
+                    newName[currentChar] = 'A';
+                } else {
+                    newName[currentChar]++;
+                    if (newName[currentChar] > 'Z') {
+                        newName[currentChar] = ' ';
+                    }
                 }
             }
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            if (currentChar < newName.length - 1) {
-                currentChar++;
+            if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+                if (currentChar < newName.length - 1) {
+                    currentChar++;
+                }
             }
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-            if (currentChar > 0) {
-                currentChar--;
+            if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+                if (currentChar > 0) {
+                    currentChar--;
+                }
             }
         }
     }

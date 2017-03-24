@@ -2,6 +2,7 @@ package com.amilek.entities;
 
 import com.amilek.main.Game;
 import com.amilek.managers.Jukebox;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 
@@ -14,6 +15,8 @@ public class FlyingSaucer extends SpaceObject {
     private int type;
     public static final int LARGE = 0;
     public static final int SMALL = 1;
+
+    private static final Color SAUCER_COLOR = new Color(Color.YELLOW);
 
     private int score;
 
@@ -172,7 +175,7 @@ public class FlyingSaucer extends SpaceObject {
 
     public void draw(ShapeRenderer sr) {
 
-        sr.setColor(1, 1, 1, 1);
+        sr.setColor(SAUCER_COLOR);
         sr.begin(ShapeRenderer.ShapeType.Line);
 
         for (int i = 0, j = shapex.length - 1;

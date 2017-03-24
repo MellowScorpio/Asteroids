@@ -2,6 +2,7 @@ package com.amilek.entities;
 
 import com.amilek.main.Game;
 import com.amilek.managers.Jukebox;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 
@@ -17,7 +18,6 @@ public class Player extends SpaceObject {
 
     private float[] flamex;
     private float[] flamey;
-
 
     private boolean left;
     private boolean right;
@@ -40,6 +40,11 @@ public class Player extends SpaceObject {
     private long score;
     private int extraLives;
     private long requiredScore;
+
+    private PopupText popupText;
+
+    private final float GOD_TIME = 1.0f;
+    private float godTimer;
 
     public Player(ArrayList<Bullet> bullets) {
 
@@ -71,6 +76,8 @@ public class Player extends SpaceObject {
         score = 0;
         extraLives = 3;
         requiredScore = 10000;
+
+        godTimer = 0;
     }
 
     private void setShape() {
@@ -109,9 +116,9 @@ public class Player extends SpaceObject {
     }
 
     public void setUp(boolean b) {
-        if(b && !up){
+        if (b && !up) {
             Jukebox.loop("thruster");
-        } else if(!b){
+        } else if (!b) {
             Jukebox.stop("thruster");
         }
         up = b;
@@ -145,7 +152,7 @@ public class Player extends SpaceObject {
 
     public void hit() {
 
-        if (hit) return;
+        if (hit || godTimer < GOD_TIME) return;
         hit = true;
         dx = dy = 0;
         left = right = up = false;
@@ -177,9 +184,18 @@ public class Player extends SpaceObject {
                 MathUtils.sin(radians + 2.8f)
         );
 
+        popupText = new PopupText(x, y, "ZAL");
     }
 
     public void update(float dt) {
+
+        //update popup
+        if(popupText != null){
+            popupText.update(dt);
+            if(popupText.shouldRemove()){
+                popupText = null;
+            }
+        }
 
         //check if hit
         if (hit) {
@@ -253,10 +269,23 @@ public class Player extends SpaceObject {
         //screen wrap (if player moves beyond screen he should appear on the other side
         wrap();
 
+        //god timer update
+        godTimer += dt;
     }
 
     public void draw(ShapeRenderer sr) {
-        sr.setColor(1, 1, 1, 1); //white
+
+        //draw popup
+        if(popupText != null){
+            popupText.draw();
+        }
+
+        if (godTimer > GOD_TIME){
+            sr.setColor(1, 1, 1, 1); //white
+        } else {
+            sr.setColor(Color.GRAY); // if god mode
+        }
+
 
         sr.begin(ShapeRenderer.ShapeType.Line);
 
@@ -294,6 +323,8 @@ public class Player extends SpaceObject {
         }
 
         sr.end();
+
+
     }
 
 
@@ -311,5 +342,7 @@ public class Player extends SpaceObject {
         setShape();
         hit = dead = false;
 
+        //god mode timer reset
+        godTimer = 0;
     }
 }
