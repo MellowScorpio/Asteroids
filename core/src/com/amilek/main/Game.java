@@ -24,16 +24,16 @@ public class Game extends ApplicationAdapter {
         camera.translate(WIDTH / 2, HEIGHT / 2);
         camera.update();//commits translate changes to camera object
 
-        Jukebox.load("sounds/explosion.wav", "explode");
-        Jukebox.load("sounds/player_dead.wav", "player_dead");
-        Jukebox.load("sounds/shoot.wav", "shoot");
-        Jukebox.load("sounds/thrust.wav", "thruster");
-        Jukebox.load("sounds/saucershoot.wav", "saucershoot");
-        Jukebox.load("sounds/pulselow.wav", "pulselow");
-        Jukebox.load("sounds/pulsehigh.wav", "pulsehigh");
-        Jukebox.load("sounds/extralife.wav", "extralife");
-        Jukebox.load("sounds/largesaucer.wav", "largesaucer");
-        Jukebox.load("sounds/smallsaucer.wav", "smallsaucer");
+        Jukebox.load("sounds/explode.ogg", "explode");
+        //Jukebox.load("sounds/player_dead.wav", "player_dead");
+        Jukebox.load("sounds/shoot.ogg", "shoot");
+        Jukebox.load("sounds/thruster.ogg", "thruster");
+        Jukebox.load("sounds/saucershoot.ogg", "saucershoot");
+        Jukebox.load("sounds/pulselow.ogg", "pulselow");
+        Jukebox.load("sounds/pulsehigh.ogg", "pulsehigh");
+        Jukebox.load("sounds/extralife.ogg", "extralife");
+        Jukebox.load("sounds/largesaucer.ogg", "largesaucer");
+        Jukebox.load("sounds/smallsaucer.ogg", "smallsaucer");
 
 
         gsm = new GameStateManager();

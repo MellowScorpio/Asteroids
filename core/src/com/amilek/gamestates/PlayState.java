@@ -254,7 +254,7 @@ public class PlayState extends GameState {
                     player.hit();
                     asteroids.remove(i);
                     splitAsteroids(a);
-                    Jukebox.play("player_dead");
+                    Jukebox.play("explode");
                     break;
                 }
             }
