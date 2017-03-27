@@ -41,7 +41,7 @@ public class Player extends SpaceObject {
     private int extraLives;
     private long requiredScore;
 
-    private PopupText popupText;
+    //private PopupText popupText;
 
     private final float GOD_TIME = 1.0f;
     private float godTimer;
@@ -184,11 +184,12 @@ public class Player extends SpaceObject {
                 MathUtils.sin(radians + 2.8f)
         );
 
-        popupText = new PopupText(x, y, "ZAL");
+        //popupText = new PopupText(x, y, "ZAL");
     }
 
     public void update(float dt) {
 
+        /* ZAL TEXT
         //update popup
         if(popupText != null){
             popupText.update(dt);
@@ -196,6 +197,7 @@ public class Player extends SpaceObject {
                 popupText = null;
             }
         }
+        */
 
         //check if hit
         if (hit) {
@@ -276,9 +278,11 @@ public class Player extends SpaceObject {
     public void draw(ShapeRenderer sr) {
 
         //draw popup
+        /*
         if(popupText != null){
             popupText.draw();
         }
+        */
 
         if (godTimer > GOD_TIME){
             sr.setColor(1, 1, 1, 1); //white

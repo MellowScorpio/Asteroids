@@ -42,6 +42,7 @@ public class MenuState extends GameState {
         sr = new ShapeRenderer();
 
         //set font
+        /*
         FreeTypeFontGenerator gen =
                 new FreeTypeFontGenerator(Gdx.files.internal("fonts/Hyperspace Bold.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter =
@@ -49,8 +50,17 @@ public class MenuState extends GameState {
         parameter.size = 56;
         titleFont = gen.generateFont(parameter);
         parameter.size = 20;
+        //font using generator - html5 incompatibile
         font = gen.generateFont(parameter);
         gen.dispose();
+        */
+
+        titleFont = new BitmapFont(Gdx.files.internal("fonts/hyperspace56px.fnt"));
+        titleFont.setColor(Color.WHITE);
+
+        // font using bitmap font - html5 friendly
+        font = new BitmapFont(Gdx.files.internal("fonts/hyperspace.fnt"));
+        font.setColor(Color.WHITE);
 
         menuItems = new String[]{
                 "Play",
